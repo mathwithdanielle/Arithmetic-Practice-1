@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal:    #2EC4C4;
+    --teal-dk: #1A9A9A;
+    --sky:     #6DDCF0;
+    --mint:    #A8F0E0;
+    --navy:    #1B3A5C;
+    --soft:    #E8F9FC;
+    --white:   #FFFFFF;
+    --gold:    #FFD166;
+    --coral:   #FF6B6B;
+    --correct: #4CC9A0;
+    --wrong:   #FF6B6B;
+    --grey:    #7A99A8;
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(160deg, #C8F0F8 0%, #E0F8F2 50%, #D0EEFA 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 40px;
+  }
+
+  .header { text-align: center; margin-bottom: 28px; }
+  .header h1 { font-size: 2rem; font-weight: 900; color: var(--navy); letter-spacing: -0.5px; }
+  .header h1 span { color: var(--teal); }
+  .stars { font-size: 1.4rem; letter-spacing: 4px; margin-top: 2px; }
+
+  .card {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 24px 20px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 8px 32px rgba(30,90,120,0.10);
+    margin-bottom: 18px;
+  }
+
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-bottom: 12px;
+  }
+
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mode-btn {
+    border: 2.5px solid #D8EEF4;
+    background: var(--soft);
+    border-radius: 14px;
+    padding: 14px 8px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--navy);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .mode-btn .emoji { font-size: 1.5rem; }
+  .mode-btn:hover { border-color: var(--teal); background: #D8F5F5; }
+  .mode-btn.active {
+    border-color: var(--teal);
+    background: linear-gradient(135deg, #C0F2F2, #A8EAF8);
+    color: var(--teal-dk);
+    box-shadow: 0 3px 12px rgba(46,196,196,0.25);
+  }
+
+  .range-btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .range-btn {
+    border: 2.5px solid #D8EEF4;
+    background: var(--soft);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--navy);
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .range-btn:hover { border-color: var(--teal); background: #D8F5F5; }
+  .range-btn.active {
+    border-color: var(--teal);
+    background: linear-gradient(135deg, #C0F2F2, #A8EAF8);
+    color: var(--teal-dk);
+    box-shadow: 0 3px 12px rgba(46,196,196,0.20);
+  }
+  .range-hint {
+    font-size: 0.78rem;
+    color: var(--grey);
+    font-weight: 600;
+    margin-top: 10px;
+    min-height: 18px;
+  }
+
+  .start-btn {
+    width: 100%;
+    padding: 16px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: var(--white);
+    background: linear-gradient(135deg, var(--teal), var(--sky));
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(46,196,196,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(46,196,196,0.40); }
+  .start-btn:active { transform: translateY(0); }
+
+  #quiz-screen { display: none; width: 100%; max-width: 420px; }
+
+  .score-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 0 4px;
+  }
+  .score-pill {
+    background: var(--white);
+    border-radius: 50px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--navy);
+    box-shadow: 0 3px 10px rgba(30,90,120,0.10);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .score-pill .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-green { background: var(--correct); }
+  .dot-red   { background: var(--wrong); }
+
+  .question-card {
+    background: var(--white);
+    border-radius: 28px;
+    padding: 36px 24px 28px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(30,90,120,0.10);
+    margin-bottom: 16px;
+  }
+  .mode-tag {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--teal-dk);
+    background: #D0F5F0;
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 50px;
+    margin-bottom: 18px;
+  }
+  .mode-tag.negatives-tag {
+    color: #7B3FBE;
+    background: #EFE0FF;
+  }
+  .retry-tag {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #CC5500;
+    background: #FFE8D0;
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 50px;
+    margin-bottom: 8px;
+    margin-left: 6px;
+  }
+  .tag-row { margin-bottom: 10px; }
+
+  .question-text {
+    font-size: 2.6rem;
+    font-weight: 900;
+    color: var(--navy);
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+
+  .answer-row { display: flex; gap: 10px; align-items: center; justify-content: center; }
+  .answer-input {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--navy);
+    text-align: center;
+    width: 130px;
+    padding: 12px 10px;
+    border: 3px solid #D8EEF4;
+    border-radius: 16px;
+    background: var(--soft);
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .answer-input:focus { border-color: var(--teal); }
+  .answer-input.correct { border-color: var(--correct); background: #DFFAF1; }
+  .answer-input.wrong   { border-color: var(--wrong);   background: #FFE8E8; }
+
+  .submit-btn {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, var(--teal), var(--sky));
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(46,196,196,0.35);
+    transition: transform 0.15s;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .submit-btn:hover { transform: scale(1.08); }
+
+  .feedback {
+    min-height: 36px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-top: 16px;
+  }
+  .feedback.correct { color: var(--correct); }
+  .feedback.wrong   { color: var(--wrong); }
+
+  .next-btn {
+    width: 100%;
+    padding: 15px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 900;
+    color: var(--white);
+    background: linear-gradient(135deg, #4CC9A0, #2EC4C4);
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    box-shadow: 0 5px 16px rgba(76,201,160,0.30);
+    transition: transform 0.15s;
+    display: none;
+    margin-bottom: 10px;
+  }
+  .next-btn.visible { display: block; }
+  .next-btn:hover { transform: translateY(-2px); }
+
+  .quit-btn {
+    background: none;
+    border: 2px solid #C8DDE8;
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--grey);
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    transition: all 0.15s;
+  }
+  .quit-btn:hover { border-color: var(--coral); color: var(--coral); }
+
+  #summary-screen { display: none; width: 100%; max-width: 420px; text-align: center; }
+  .summary-card {
+    background: var(--white);
+    border-radius: 28px;
+    padding: 36px 24px;
+    box-shadow: 0 8px 32px rgba(30,90,120,0.10);
+  }
+  .big-emoji { font-size: 4rem; margin-bottom: 12px; }
+  .summary-title { font-size: 1.6rem; font-weight: 900; color: var(--navy); margin-bottom: 6px; }
+  .summary-sub { font-size: 1rem; color: var(--grey); font-weight: 600; margin-bottom: 24px; }
+  .summary-stats { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+  .stat-box { background: var(--soft); border-radius: 16px; padding: 14px 18px; min-width: 80px; }
+  .stat-num { font-size: 2rem; font-weight: 900; color: var(--teal-dk); display: block; }
+  .stat-lbl { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--grey); }
+
+  .review-toggle {
+    background: none;
+    border: 2.5px solid #FFD6D6;
+    border-radius: 14px;
+    padding: 12px 16px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: var(--wrong);
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 12px;
+    transition: all 0.15s;
+  }
+  .review-toggle:hover { background: #FFF0F0; }
+  .review-toggle.hidden-btn { display: none; }
+
+  .missed-list { margin-bottom: 16px; display: none; }
+  .missed-list.open { display: block; }
+  .missed-header {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-bottom: 10px;
+    text-align: left;
+  }
+  .missed-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #FFF5F5;
+    border: 2px solid #FFD6D6;
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .missed-item.mastered {
+    background: #F0FFF8;
+    border-color: #B0EDD6;
+  }
+  .missed-item .q-text { font-weight: 800; }
+  .missed-item .correct-ans { color: var(--correct); font-weight: 900; }
+  .missed-item .your-ans { color: var(--wrong); font-size: 0.82rem; }
+  .missed-item .mastered-badge {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--correct);
+    background: #DFFAF1;
+    padding: 2px 8px;
+    border-radius: 50px;
+  }
+
+  .play-again-btn {
+    width: 100%;
+    padding: 16px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--white);
+    background: linear-gradient(135deg, var(--teal), var(--sky));
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(46,196,196,0.35);
+    transition: transform 0.15s;
+  }
+  .play-again-btn:hover { transform: translateY(-2px); }
+
+  #confetti-canvas {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 999;
+  }
+
+  @media (max-width: 380px) {
+    .question-text { font-size: 2.1rem; }
+    .answer-input  { font-size: 1.5rem; width: 110px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ══ SETUP ══ -->
+<div id="setup-screen">
+  <div class="header">
+    <h1>⭐ Math <span>Practice</span> ⭐</h1>
+    <div class="stars">🌊 🐠 🌊</div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Choose a mode</div>
+    <div class="mode-grid">
+      <button class="mode-btn active" data-mode="multiplication" onclick="selectMode(this)">
+        <span class="emoji">✖️</span>Multiplication
+      </button>
+      <button class="mode-btn" data-mode="division" onclick="selectMode(this)">
+        <span class="emoji">➗</span>Division
+      </button>
+      <button class="mode-btn" data-mode="addition" onclick="selectMode(this)">
+        <span class="emoji">➕</span>Addition
+      </button>
+      <button class="mode-btn" data-mode="subtraction" onclick="selectMode(this)">
+        <span class="emoji">➖</span>Subtraction
+      </button>
+      <button class="mode-btn" data-mode="negatives" onclick="selectMode(this)" style="grid-column: span 2;">
+        <span class="emoji">➕➖</span>Negatives Mix
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Number range</div>
+    <div class="range-btn-group">
+      <button class="range-btn" data-range="6-9" onclick="selectRange(this)">6 – 9</button>
+      <button class="range-btn" data-range="1-10" onclick="selectRange(this)">1 – 10</button>
+      <button class="range-btn active" data-range="1-12" onclick="selectRange(this)">1 – 12</button>
+    </div>
+    <div class="range-hint" id="range-hint">Numbers 1–12 on both sides</div>
+  </div>
+
+  <div style="max-width:420px; width:100%;">
+    <button class="start-btn" onclick="startQuiz()">Let's go! 🚀</button>
+  </div>
+</div>
+
+<!-- ══ QUIZ ══ -->
+<div id="quiz-screen">
+  <div class="score-bar">
+    <div class="score-pill"><span class="dot dot-green"></span><span id="correct-count">0</span> correct</div>
+    <div class="score-pill"><span class="dot dot-red"></span><span id="wrong-count">0</span> wrong</div>
+    <div class="score-pill">🔢 <span id="q-count">0</span></div>
+  </div>
+
+  <div class="question-card">
+    <div class="tag-row">
+      <span class="mode-tag" id="mode-tag">Multiplication</span>
+      <span class="retry-tag" id="retry-tag" style="display:none">Try again! 🔁</span>
+    </div>
+    <div class="question-text" id="question-text">3 × 4 = ?</div>
+    <div class="answer-row">
+      <input class="answer-input" id="answer-input" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="?" autocomplete="off">
+      <button class="submit-btn" onclick="checkAnswer()">✓</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next question →</button>
+  <button class="quit-btn" onclick="endQuiz()">End session</button>
+</div>
+
+<!-- ══ SUMMARY ══ -->
+<div id="summary-screen">
+  <div class="summary-card">
+    <div class="big-emoji" id="summary-emoji">🎉</div>
+    <div class="summary-title" id="summary-title">Great work!</div>
+    <div class="summary-sub" id="summary-sub">Here's how you did:</div>
+
+    <div class="summary-stats">
+      <div class="stat-box">
+        <span class="stat-num" id="s-correct">0</span>
+        <span class="stat-lbl">Correct</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num" id="s-wrong">0</span>
+        <span class="stat-lbl">Wrong</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num" id="s-total">0</span>
+        <span class="stat-lbl">Total</span>
+      </div>
+    </div>
+
+    <button class="review-toggle hidden-btn" id="review-toggle" onclick="toggleReview()">
+      👀 See missed questions
+    </button>
+    <div class="missed-list" id="missed-list">
+      <div class="missed-header">Questions you missed</div>
+      <div id="missed-items"></div>
+    </div>
+
+    <button class="play-again-btn" onclick="playAgain()">Play again 🌟</button>
+  </div>
+</div>
+
+<script>
+  let mode = 'multiplication';
+  let rangeMode = '1-12';
+  let correctCount = 0, wrongCount = 0, totalCount = 0;
+  let currentAnswer = 0, currentQuestion = '';
+  let answered = false;
+  let isRetry = false;
+  let attemptCount = 0; // tracks tries on current question (max 2)
+
+  // Missed queue: array of {question, answer, yourAnswer, masteredOnRetry}
+  let missedLog = [];
+  // Retry queue: pending retries to inject
+  let retryQueue = [];
+  // Counter since last retry injection
+  let totalNewQuestions = 0; // counts only fresh (non-retry) questions asked
+  const RETRY_DELAY = 5; // how many NEW questions must pass before a retry is eligible
+
+  const modeLabels = {
+    multiplication: 'Multiplication',
+    division: 'Division',
+    addition: 'Addition',
+    subtraction: 'Subtraction',
+    negatives: 'Negatives Mix'
+  };
+
+  const rangeHints = {
+    '6-9':  'One number is 6–9, the other is 2–12',
+    '1-10': 'Numbers 1–10 on both sides',
+    '1-12': 'Numbers 1–12 on both sides'
+  };
+
+  function selectMode(btn) {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    mode = btn.dataset.mode;
+  }
+
+  function selectRange(btn) {
+    document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    rangeMode = btn.dataset.range;
+    document.getElementById('range-hint').textContent = rangeHints[rangeMode];
+  }
+
+  function startQuiz() {
+    correctCount = 0; wrongCount = 0; totalCount = 0;
+    missedLog = []; retryQueue = []; totalNewQuestions = 0;
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('quiz-screen').style.display = 'block';
+    const modeTagEl = document.getElementById('mode-tag');
+    modeTagEl.textContent = modeLabels[mode];
+    modeTagEl.className = 'mode-tag' + (mode === 'negatives' ? ' negatives-tag' : '');
+    generateQuestion();
+  }
+
+  function rand(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function makeQuestion() {
+    let a, b, question, answer;
+
+    if (mode === 'multiplication') {
+      if (rangeMode === '6-9') {
+        a = rand(6, 9);
+        b = rand(2, 12);
+        // randomize order
+        if (Math.random() < 0.5) [a, b] = [b, a];
+      } else if (rangeMode === '1-10') {
+        a = rand(1, 10); b = rand(1, 10);
+      } else {
+        a = rand(1, 12); b = rand(1, 12);
+      }
+      answer = a * b;
+      question = `${a} × ${b}`;
+
+    } else if (mode === 'division') {
+      if (rangeMode === '6-9') {
+        b = rand(6, 9);
+        answer = rand(2, 12);
+      } else if (rangeMode === '1-10') {
+        b = rand(1, 10); answer = rand(1, 10);
+      } else {
+        b = rand(1, 12); answer = rand(1, 12);
+      }
+      a = b * answer;
+      question = `${a} ÷ ${b}`;
+
+    } else if (mode === 'addition') {
+      const top = rangeMode === '6-9' ? 18 : rangeMode === '1-10' ? 20 : 24;
+      a = rand(1, top); b = rand(1, top);
+      answer = a + b;
+      question = `${a} + ${b}`;
+
+    } else {
+      const top = rangeMode === '6-9' ? 18 : rangeMode === '1-10' ? 20 : 24;
+      a = rand(1, top); b = rand(1, a);
+      answer = a - b;
+      question = `${a} − ${b}`;
+    }
+
+    return { question, answer };
+  }
+
+  function makeNegativesQuestion() {
+    // Weighted: ~50% add/sub, ~25% multiply, ~25% divide
+    const roll = Math.random();
+    let a, b, question, answer;
+
+    const rangeN = rangeMode === '6-9' ? 9 : rangeMode === '1-10' ? 10 : 12;
+
+    if (roll < 0.28) {
+      // Addition with negatives
+      a = rand(-rangeN, rangeN);
+      b = rand(-rangeN, rangeN);
+      answer = a + b;
+      const bStr = b < 0 ? `(${b})` : `${b}`;
+      question = `${a} + ${bStr}`;
+
+    } else if (roll < 0.55) {
+      // Subtraction with negatives
+      a = rand(-rangeN, rangeN);
+      b = rand(-rangeN, rangeN);
+      answer = a - b;
+      const bStr = b < 0 ? `(${b})` : `${b}`;
+      question = `${a} − ${bStr}`;
+
+    } else if (roll < 0.78) {
+      // Multiplication with negatives (smaller numbers)
+      a = rand(-6, 6);
+      b = rand(-6, 6);
+      answer = a * b;
+      const aStr = a < 0 ? `(${a})` : `${a}`;
+      const bStr = b < 0 ? `(${b})` : `${b}`;
+      question = `${aStr} × ${bStr}`;
+
+    } else {
+      // Division with negatives
+      b = rand(1, 6) * (Math.random() < 0.5 ? 1 : -1);
+      answer = rand(1, 6) * (Math.random() < 0.5 ? 1 : -1);
+      a = b * answer;
+      const aStr = a < 0 ? `(${a})` : `${a}`;
+      const bStr = b < 0 ? `(${b})` : `${b}`;
+      question = `${aStr} ÷ ${bStr}`;
+    }
+
+    return { question, answer };
+  }
+
+  function generateQuestion() {
+    answered = false;
+    isRetry = false;
+    const input = document.getElementById('answer-input');
+    const feedback = document.getElementById('feedback');
+    const nextBtn = document.getElementById('next-btn');
+    const retryTag = document.getElementById('retry-tag');
+
+    input.value = '';
+    input.className = 'answer-input';
+    input.disabled = false;
+    feedback.textContent = '';
+    feedback.className = 'feedback';
+    nextBtn.classList.remove('visible');
+    retryTag.style.display = 'none';
+    attemptCount = 0;
+
+    // Should we inject a retry? Find first eligible one
+    const eligibleIdx = retryQueue.findIndex(r => totalNewQuestions >= r.eligibleAt);
+    if (eligibleIdx !== -1) {
+      const retry = retryQueue.splice(eligibleIdx, 1)[0];
+      currentQuestion = retry.question;
+      currentAnswer = retry.answer;
+      isRetry = true;
+      retryTag.style.display = 'inline-block';
+    } else {
+      const q = mode === 'negatives' ? makeNegativesQuestion() : makeQuestion();
+      currentQuestion = q.question;
+      currentAnswer = q.answer;
+      totalNewQuestions++;
+    }
+
+    document.getElementById('question-text').textContent = currentQuestion + ' = ?';
+    totalCount++;
+    document.getElementById('q-count').textContent = totalCount;
+    input.focus();
+  }
+
+  function checkAnswer() {
+    if (answered) return;
+    const input = document.getElementById('answer-input');
+    const val = input.value.trim();
+    if (val === '') return;
+
+    const userAnswer = parseInt(val);
+    const feedback = document.getElementById('feedback');
+    const nextBtn = document.getElementById('next-btn');
+
+    attemptCount++;
+
+    if (userAnswer === currentAnswer) {
+      answered = true;
+      input.disabled = true;
+      correctCount++;
+      document.getElementById('correct-count').textContent = correctCount;
+      input.classList.add('correct');
+      const praise = attemptCount === 1
+        ? ['🌟 Correct!', '✨ Nailed it!', '🎯 Right!', '💫 Awesome!', '🌊 Yes!', '⭐ Perfect!']
+        : ['💪 Got it!', '✨ There you go!', '💙 You got it!', "🎯 Second time's the charm!"];
+      feedback.textContent = praise[Math.floor(Math.random() * praise.length)];
+      feedback.className = 'feedback correct';
+
+      if (isRetry) {
+        const entry = missedLog.find(m => m.question === currentQuestion && !m.mastered);
+        if (entry) entry.mastered = true;
+      } else if (attemptCount === 2) {
+        // Got it on second try — still queue for retry, log as missed
+        missedLog.push({ question: currentQuestion, answer: currentAnswer, yourAnswer: userAnswer, mastered: false });
+        retryQueue.push({ question: currentQuestion, answer: currentAnswer, eligibleAt: totalNewQuestions + RETRY_DELAY });
+      }
+      nextBtn.classList.add('visible');
+
+    } else if (attemptCount === 1) {
+      // First wrong — give them a second shot
+      input.classList.add('wrong');
+      feedback.textContent = 'Not quite — try one more time! 🤔';
+      feedback.className = 'feedback wrong';
+      setTimeout(() => {
+        input.value = '';
+        input.className = 'answer-input';
+        input.focus();
+      }, 700);
+
+    } else {
+      // Second wrong — reveal and move on
+      answered = true;
+      input.disabled = true;
+      wrongCount++;
+      document.getElementById('wrong-count').textContent = wrongCount;
+      input.classList.add('wrong');
+      feedback.textContent = `The answer is ${currentAnswer} 💙`;
+      feedback.className = 'feedback wrong';
+
+      if (isRetry) {
+        retryQueue.push({ question: currentQuestion, answer: currentAnswer, eligibleAt: totalNewQuestions + RETRY_DELAY });
+      } else {
+        missedLog.push({ question: currentQuestion, answer: currentAnswer, yourAnswer: userAnswer, mastered: false });
+        retryQueue.push({ question: currentQuestion, answer: currentAnswer, eligibleAt: totalNewQuestions + RETRY_DELAY });
+      }
+      nextBtn.classList.add('visible');
+    }
+  }
+
+  function nextQuestion() { generateQuestion(); }
+
+  function endQuiz() {
+    document.getElementById('quiz-screen').style.display = 'none';
+    showSummary();
+  }
+
+  function showSummary() {
+    document.getElementById('summary-screen').style.display = 'block';
+    document.getElementById('s-correct').textContent = correctCount;
+    document.getElementById('s-wrong').textContent = wrongCount;
+    document.getElementById('s-total').textContent = totalCount;
+
+    const pct = totalCount > 0 ? correctCount / totalCount : 0;
+    let emoji, title, sub;
+    if (pct === 1)       { emoji='🏆'; title='Perfect score!';   sub='You got every single one right!'; }
+    else if (pct >= 0.8) { emoji='🌟'; title='Amazing job!';     sub='You really know your math facts!'; }
+    else if (pct >= 0.6) { emoji='💪'; title='Good work!';       sub='Keep practicing — you\'re getting it!'; }
+    else                 { emoji='💙'; title='Keep going!';       sub='Practice makes perfect!'; }
+
+    document.getElementById('summary-emoji').textContent = emoji;
+    document.getElementById('summary-title').textContent = title;
+    document.getElementById('summary-sub').textContent = sub;
+
+    const toggle = document.getElementById('review-toggle');
+    if (missedLog.length > 0) {
+      toggle.classList.remove('hidden-btn');
+      toggle.textContent = `👀 See ${missedLog.length} missed question${missedLog.length > 1 ? 's' : ''}`;
+      buildMissedList();
+    } else {
+      toggle.classList.add('hidden-btn');
+    }
+
+    if (pct >= 0.8 && totalCount >= 3) launchConfetti();
+  }
+
+  function buildMissedList() {
+    const container = document.getElementById('missed-items');
+    container.innerHTML = '';
+    missedLog.forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'missed-item' + (m.mastered ? ' mastered' : '');
+      if (m.mastered) {
+        div.innerHTML = `
+          <span class="q-text">${m.question} = ?</span>
+          <span>
+            <span class="correct-ans">✓ ${m.answer}</span>
+            <span class="mastered-badge">got it later! ✨</span>
+          </span>
+        `;
+      } else {
+        div.innerHTML = `
+          <span class="q-text">${m.question} = ?</span>
+          <span>
+            <span class="correct-ans">✓ ${m.answer}</span>
+            <span class="your-ans"> (you said ${m.yourAnswer})</span>
+          </span>
+        `;
+      }
+      container.appendChild(div);
+    });
+  }
+
+  function toggleReview() {
+    const list = document.getElementById('missed-list');
+    const btn = document.getElementById('review-toggle');
+    const isOpen = list.classList.toggle('open');
+    btn.textContent = isOpen
+      ? `▲ Hide missed questions`
+      : `👀 See ${missedLog.length} missed question${missedLog.length > 1 ? 's' : ''}`;
+  }
+
+  function playAgain() {
+    document.getElementById('summary-screen').style.display = 'none';
+    document.getElementById('missed-list').classList.remove('open');
+    document.getElementById('setup-screen').style.display = 'block';
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (!answered) checkAnswer();
+      else {
+        const nextBtn = document.getElementById('next-btn');
+        if (nextBtn.classList.contains('visible')) nextQuestion();
+      }
+    }
+  });
+
+  function launchConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const colors = ['#2EC4C4','#6DDCF0','#A8F0E0','#FFD166','#FF6B6B','#4CC9A0','#FFFFFF'];
+    const pieces = Array.from({length: 120}, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * -canvas.height,
+      r: Math.random() * 7 + 4,
+      d: Math.random() * 120 + 60,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      tilt: Math.random() * 10 - 5,
+      tiltAngle: 0,
+      tiltSpeed: Math.random() * 0.07 + 0.02
+    }));
+    let frame = 0;
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pieces.forEach(p => {
+        ctx.beginPath(); ctx.lineWidth = p.r; ctx.strokeStyle = p.color;
+        ctx.moveTo(p.x + p.tilt + p.r / 3, p.y);
+        ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r * 1.4);
+        ctx.stroke();
+      });
+      pieces.forEach(p => {
+        p.tiltAngle += p.tiltSpeed;
+        p.y += (Math.cos(frame / p.d) + 1.5) * 1.6;
+        p.tilt = Math.sin(p.tiltAngle) * 12;
+        if (p.y > canvas.height) { p.y = -20; p.x = Math.random() * canvas.width; }
+      });
+      frame++;
+      if (frame < 200) requestAnimationFrame(draw);
+      else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    draw();
+  }
+</script>
+</body>
+</html>
