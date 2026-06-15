@@ -156,7 +156,7 @@
   .question-card {
     background: var(--white);
     border-radius: 28px;
-    padding: 36px 24px 28px;
+    padding: 20px 24px 16px;
     text-align: center;
     box-shadow: 0 8px 32px rgba(30,90,120,0.10);
     margin-bottom: 16px;
@@ -197,7 +197,7 @@
     font-weight: 900;
     color: var(--navy);
     line-height: 1.1;
-    margin-bottom: 24px;
+    margin-bottom: 14px;
   }
 
   .answer-row { display: flex; gap: 10px; align-items: center; justify-content: center; }
@@ -365,9 +365,9 @@
   /* ── Custom Keypad ── */
   .keypad {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
-    margin-top: 20px;
+    margin-top: 10px;
   }
   .key {
     font-family: 'Nunito', sans-serif;
@@ -395,9 +395,9 @@
     border-color: #FFD6D6;
     color: var(--wrong);
   }
-  .key-zero { grid-column: span 2; }
+  .key-zero { }
   .key-enter {
-    grid-column: span 4;
+    grid-column: span 3;
     background: linear-gradient(135deg, var(--teal), var(--sky));
     color: white;
     border-color: var(--teal);
@@ -413,7 +413,7 @@
     cursor: default;
   }
   .key-next {
-    grid-column: span 4;
+    grid-column: span 3;
     background: linear-gradient(135deg, #4CC9A0, #2EC4C4);
     color: white;
     border-color: #4CC9A0;
@@ -492,18 +492,18 @@
 
     <!-- Custom keypad -->
     <div class="keypad">
+      <button class="key" onclick="keyPress('1')">1</button>
+      <button class="key" onclick="keyPress('2')">2</button>
+      <button class="key" onclick="keyPress('3')">3</button>
+      <button class="key" onclick="keyPress('4')">4</button>
+      <button class="key" onclick="keyPress('5')">5</button>
+      <button class="key" onclick="keyPress('6')">6</button>
       <button class="key" onclick="keyPress('7')">7</button>
       <button class="key" onclick="keyPress('8')">8</button>
       <button class="key" onclick="keyPress('9')">9</button>
       <button class="key key-neg" onclick="keyPress('-')">+/−</button>
-      <button class="key" onclick="keyPress('4')">4</button>
-      <button class="key" onclick="keyPress('5')">5</button>
-      <button class="key" onclick="keyPress('6')">6</button>
-      <button class="key key-del" onclick="keyDel()">⌫</button>
-      <button class="key" onclick="keyPress('1')">1</button>
-      <button class="key" onclick="keyPress('2')">2</button>
-      <button class="key" onclick="keyPress('3')">3</button>
       <button class="key key-zero" onclick="keyPress('0')">0</button>
+      <button class="key key-del" onclick="keyDel()">⌫</button>
       <button class="key key-enter" id="enter-btn" onclick="checkAnswer()">Enter ✓</button>
       <button class="key key-next" id="next-btn" onclick="nextQuestion()" style="display:none">Next →</button>
     </div>
