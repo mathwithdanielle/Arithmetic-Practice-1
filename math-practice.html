@@ -245,24 +245,7 @@
   .feedback.correct { color: var(--correct); }
   .feedback.wrong   { color: var(--wrong); }
 
-  .next-btn {
-    width: 100%;
-    padding: 15px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 1.05rem;
-    font-weight: 900;
-    color: var(--white);
-    background: linear-gradient(135deg, #4CC9A0, #2EC4C4);
-    border: none;
-    border-radius: 16px;
-    cursor: pointer;
-    box-shadow: 0 5px 16px rgba(76,201,160,0.30);
-    transition: transform 0.15s;
-    display: none;
-    margin-bottom: 10px;
-  }
-  .next-btn.visible { display: block; }
-  .next-btn:hover { transform: translateY(-2px); }
+
 
   .quit-btn {
     background: none;
@@ -429,6 +412,16 @@
     box-shadow: none;
     cursor: default;
   }
+  .key-next {
+    grid-column: span 4;
+    background: linear-gradient(135deg, #4CC9A0, #2EC4C4);
+    color: white;
+    border-color: #4CC9A0;
+    font-size: 1.1rem;
+    padding: 16px;
+    box-shadow: 0 4px 14px rgba(76,201,160,0.30);
+  }
+  .key-next:active { transform: scale(0.97); }
 </style>
 </head>
 <body>
@@ -511,11 +504,11 @@
       <button class="key" onclick="keyPress('2')">2</button>
       <button class="key" onclick="keyPress('3')">3</button>
       <button class="key key-zero" onclick="keyPress('0')">0</button>
-      <button class="key key-enter" onclick="checkAnswer()">Enter ✓</button>
+      <button class="key key-enter" id="enter-btn" onclick="checkAnswer()">Enter ✓</button>
+      <button class="key key-next" id="next-btn" onclick="nextQuestion()" style="display:none">Next →</button>
     </div>
   </div>
 
-  <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next question →</button>
   <button class="quit-btn" onclick="endQuiz()">End session</button>
 </div>
 
@@ -715,7 +708,8 @@
     input.disabled = false;
     feedback.textContent = '';
     feedback.className = 'feedback';
-    nextBtn.classList.remove('visible');
+    nextBtn.style.display = 'none';
+    document.getElementById('enter-btn').style.display = 'block';
     retryTag.style.display = 'none';
     attemptCount = 0;
 
@@ -768,11 +762,11 @@
         const entry = missedLog.find(m => m.question === currentQuestion && !m.mastered);
         if (entry) entry.mastered = true;
       } else if (attemptCount === 2) {
-        // Got it on second try — still queue for retry, log as missed
         missedLog.push({ question: currentQuestion, answer: currentAnswer, yourAnswer: userAnswer, mastered: false });
         retryQueue.push({ question: currentQuestion, answer: currentAnswer, eligibleAt: totalNewQuestions + RETRY_DELAY });
       }
-      nextBtn.classList.add('visible');
+      nextBtn.style.display = 'block';
+      document.getElementById('enter-btn').style.display = 'none';
 
     } else if (attemptCount === 1) {
       // First wrong — give them a second shot
@@ -800,7 +794,8 @@
         missedLog.push({ question: currentQuestion, answer: currentAnswer, yourAnswer: userAnswer, mastered: false });
         retryQueue.push({ question: currentQuestion, answer: currentAnswer, eligibleAt: totalNewQuestions + RETRY_DELAY });
       }
-      nextBtn.classList.add('visible');
+      nextBtn.style.display = 'block';
+      document.getElementById('enter-btn').style.display = 'none';
     }
   }
 
@@ -885,11 +880,11 @@
   document.addEventListener('keydown', e => {
     if (e.key === 'Enter') {
       if (!answered) checkAnswer();
-      else {
-        const nextBtn = document.getElementById('next-btn');
-        if (nextBtn.classList.contains('visible')) nextQuestion();
-      }
+      else nextQuestion();
     }
+    if (e.key === 'Backspace') keyDel();
+    if (e.key >= '0' && e.key <= '9') keyPress(e.key);
+    if (e.key === '-') keyPress('-');
   });
 
   function launchConfetti() {
