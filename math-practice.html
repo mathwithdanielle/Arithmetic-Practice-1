@@ -378,6 +378,57 @@
     .question-text { font-size: 2.1rem; }
     .answer-input  { font-size: 1.5rem; width: 110px; }
   }
+
+  /* ── Custom Keypad ── */
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .key {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--navy);
+    background: var(--soft);
+    border: 2.5px solid #D8EEF4;
+    border-radius: 14px;
+    padding: 16px 8px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .key:active { transform: scale(0.93); background: #C8EEF8; }
+  .key-neg {
+    background: #EFE0FF;
+    border-color: #D4B8F5;
+    color: #7B3FBE;
+    font-size: 1rem;
+  }
+  .key-del {
+    background: #FFF0F0;
+    border-color: #FFD6D6;
+    color: var(--wrong);
+  }
+  .key-zero { grid-column: span 2; }
+  .key-enter {
+    grid-column: span 4;
+    background: linear-gradient(135deg, var(--teal), var(--sky));
+    color: white;
+    border-color: var(--teal);
+    font-size: 1.1rem;
+    padding: 16px;
+    box-shadow: 0 4px 14px rgba(46,196,196,0.30);
+  }
+  .key-enter:active { transform: scale(0.97); }
+  .key-enter:disabled, .key-enter.used {
+    background: #C8DDE8;
+    border-color: #C8DDE8;
+    box-shadow: none;
+    cursor: default;
+  }
 </style>
 </head>
 <body>
@@ -442,10 +493,26 @@
     </div>
     <div class="question-text" id="question-text">3 × 4 = ?</div>
     <div class="answer-row">
-      <input class="answer-input" id="answer-input" type="text" inputmode="text" pattern="-?[0-9]*" placeholder="?" autocomplete="off">
-      <button class="submit-btn" onclick="checkAnswer()">✓</button>
+      <input class="answer-input" id="answer-input" type="text" readonly placeholder="?" autocomplete="off">
     </div>
     <div class="feedback" id="feedback"></div>
+
+    <!-- Custom keypad -->
+    <div class="keypad">
+      <button class="key" onclick="keyPress('7')">7</button>
+      <button class="key" onclick="keyPress('8')">8</button>
+      <button class="key" onclick="keyPress('9')">9</button>
+      <button class="key key-neg" onclick="keyPress('-')">+/−</button>
+      <button class="key" onclick="keyPress('4')">4</button>
+      <button class="key" onclick="keyPress('5')">5</button>
+      <button class="key" onclick="keyPress('6')">6</button>
+      <button class="key key-del" onclick="keyDel()">⌫</button>
+      <button class="key" onclick="keyPress('1')">1</button>
+      <button class="key" onclick="keyPress('2')">2</button>
+      <button class="key" onclick="keyPress('3')">3</button>
+      <button class="key key-zero" onclick="keyPress('0')">0</button>
+      <button class="key key-enter" onclick="checkAnswer()">Enter ✓</button>
+    </div>
   </div>
 
   <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next question →</button>
@@ -715,7 +782,6 @@
       setTimeout(() => {
         input.value = '';
         input.className = 'answer-input';
-        input.focus();
       }, 700);
 
     } else {
@@ -863,6 +929,38 @@
     }
     draw();
   }
+
+  function keyPress(val) {
+    const input = document.getElementById('answer-input');
+    if (input.disabled) return;
+    if (val === '-') {
+      // Toggle negative
+      if (input.value.startsWith('-')) {
+        input.value = input.value.slice(1);
+      } else if (input.value !== '' && input.value !== '0') {
+        input.value = '-' + input.value;
+      } else {
+        input.value = '-';
+      }
+    } else {
+      if (input.value === '-') {
+        input.value = '-' + val;
+      } else if (input.value === '0') {
+        input.value = val;
+      } else {
+        if (input.value.replace('-','').length < 4) {
+          input.value += val;
+        }
+      }
+    }
+  }
+
+  function keyDel() {
+    const input = document.getElementById('answer-input');
+    if (input.disabled) return;
+    input.value = input.value.slice(0, -1);
+  }
+
 </script>
 </body>
 </html>
